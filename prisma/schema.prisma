@@ -39,7 +39,7 @@ enum RegistrationStatus {
   CANCELLED
 }
 
-/// USERS
+// #region USERS
 model User {
   id        String    @id @default(uuid())
   email     String    @unique
@@ -51,7 +51,7 @@ model User {
   updatedAt DateTime  @updatedAt
 }
 
-/// PROFILES (Data Diri Peserta)
+// #region PROFILES (Data Diri Peserta)
 model Profile {
   id          String          @id @default(uuid())
   user        User            @relation(fields: [userId], references: [id])
@@ -70,7 +70,7 @@ model Profile {
   updatedAt DateTime @updatedAt
 }
 
-/// EVENTS / OLIMPIADE
+// #region EVENTS / OLIMPIADE
 model Event {
   id            String          @id @default(uuid())
   name          String
@@ -88,7 +88,7 @@ model Event {
   createdAt DateTime @default(now())
 }
 
-/// TEAM (UNTUK LOMBA GRUP)
+// #region TEAM (UNTUK LOMBA GRUP)
 model Team {
   id            String        @id @default(uuid())
   event         Event         @relation(fields: [eventId], references: [id])
@@ -103,7 +103,7 @@ model Team {
   createdAt DateTime @default(now())
 }
 
-/// ANGGOTA TIM
+// #region ANGGOTA TIM
 model TeamMember {
   id        String   @id @default(uuid())
   team      Team     @relation(fields: [teamId], references: [id])
@@ -113,7 +113,7 @@ model TeamMember {
   profileId String
 }
 
-/// REGISTRATION (DAFTAR EVENT)
+// #region REGISTRATION (DAFTAR EVENT)
 model Registration {
   id         String              @id @default(uuid())
   event      Event               @relation(fields: [eventId], references: [id])
@@ -140,7 +140,7 @@ model Registration {
   @@unique([eventId, teamId])
 }
 
-/// RESULT (HASIL LOMBA)
+// #region RESULT (HASIL LOMBA)
 model Result {
   id              String         @id @default(uuid())
   registration    Registration   @relation(fields: [registrationId], references: [id])
@@ -158,7 +158,7 @@ model Result {
   createdAt       DateTime @default(now())
 }
 
-/// FILE / KARYA RESULT
+// #region FILE / KARYA RESULT
 model ResultFile {
   id        String    @id @default(uuid())
   result    Result    @relation(fields: [resultId], references: [id])
@@ -170,7 +170,7 @@ model ResultFile {
   createdAt DateTime @default(now())
 }
 
-/// CERTIFICATE
+// #region CERTIFICATE
 model Certificate {
   id              String         @id @default(uuid())
   registration    Registration   @relation(fields: [registrationId], references: [id])
