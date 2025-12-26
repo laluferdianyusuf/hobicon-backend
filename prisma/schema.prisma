@@ -1,0 +1,182 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  PARENT
+  STUDENT
+  COACH
+}
+
+enum EventCategory {
+  INDIVIDUAL
+  TEAM
+}
+
+enum FileType {
+  IMAGE
+  VIDEO
+  PDF
+  OTHER
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  PAID
+  VERIFIED
+  CANCELLED
+}
+
+/// USERS
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  role      UserRole  @default(STUDENT)
+  profiles  Profile[]
+  teams     Team[]    @relation("CoachTeams")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+/// PROFILES (Data Diri Peserta)
+model Profile {
+  id          String          @id @default(uuid())
+  user        User            @relation(fields: [userId], references: [id])
+  userId      String
+  fullName    String
+  birthDate   DateTime?
+  gender      String?
+  school      String?
+  level       String?
+  verified    Boolean         @default(false)
+
+  teamMembers TeamMember[]
+  registrations Registration[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// EVENTS / OLIMPIADE
+model Event {
+  id            String          @id @default(uuid())
+  name          String
+  category      EventCategory
+  field         String
+  description   String?
+  startDate     DateTime
+  endDate       DateTime
+  status        String
+
+  teams         Team[]
+  registrations Registration[]
+  results       Result[]
+
+  createdAt DateTime @default(now())
+}
+
+/// TEAM (UNTUK LOMBA GRUP)
+model Team {
+  id            String        @id @default(uuid())
+  event         Event         @relation(fields: [eventId], references: [id])
+  eventId       String
+  name          String
+  coach         User?         @relation("CoachTeams", fields: [coachUserId], references: [id])
+  coachUserId   String?
+
+  members       TeamMember[]
+  registrations Registration[]
+
+  createdAt DateTime @default(now())
+}
+
+/// ANGGOTA TIM
+model TeamMember {
+  id        String   @id @default(uuid())
+  team      Team     @relation(fields: [teamId], references: [id])
+  teamId    String
+
+  profile   Profile  @relation(fields: [profileId], references: [id])
+  profileId String
+}
+
+/// REGISTRATION (DAFTAR EVENT)
+model Registration {
+  id         String              @id @default(uuid())
+  event      Event               @relation(fields: [eventId], references: [id])
+  eventId    String
+
+  /// Jika INDIVIDUAL -> isi profileId
+  profile    Profile?            @relation(fields: [profileId], references: [id])
+  profileId  String?
+
+  /// Jika TEAM -> isi teamId
+  team       Team?               @relation(fields: [teamId], references: [id])
+  teamId     String?
+
+  status     RegistrationStatus  @default(REGISTERED)
+
+  result     Result?
+  certificates Certificate[]
+
+  createdAt DateTime @default(now())
+
+  @@index([profileId])
+  @@index([teamId])
+  @@unique([eventId, profileId])
+  @@unique([eventId, teamId])
+}
+
+/// RESULT (HASIL LOMBA)
+model Result {
+  id              String         @id @default(uuid())
+  registration    Registration   @relation(fields: [registrationId], references: [id])
+  registrationId  String @unique
+
+  event           Event          @relation(fields: [eventId], references: [id])
+  eventId         String
+
+  score           Float?
+  rank            Int?
+  passed          Boolean?       @default(false)
+  judgeNotes      String?
+
+  files           ResultFile[]
+  createdAt       DateTime @default(now())
+}
+
+/// FILE / KARYA RESULT
+model ResultFile {
+  id        String    @id @default(uuid())
+  result    Result    @relation(fields: [resultId], references: [id])
+  resultId  String
+
+  fileType  FileType
+  url       String
+
+  createdAt DateTime @default(now())
+}
+
+/// CERTIFICATE
+model Certificate {
+  id              String         @id @default(uuid())
+  registration    Registration   @relation(fields: [registrationId], references: [id])
+  registrationId  String
+
+  fileUrl         String
+  type            String         /// peserta / juara dll
+  issuedAt        DateTime       @default(now())
+}
