@@ -8,6 +8,7 @@ import { swaggerSpec, swaggerUiMiddleware } from "./config/swagger";
 
 import v1Router from "./routes/index";
 import { setupRedisSubscriber } from "./events/redis.subscriber";
+import { protection } from "./middlewares/protection";
 
 const port = process.env.PORT || 2111;
 const socketPort = process.env.SOCKET_PORT || 2112;

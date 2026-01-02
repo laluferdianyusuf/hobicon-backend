@@ -6,7 +6,11 @@ export class AuthRepo {
     return prisma.user.create({ data });
   }
 
-  async fetchUserByEmail(email: string) {
+  async fetchUserByEmail(email: string): Promise<User | null> {
     return prisma.user.findFirst({ where: { email } });
+  }
+
+  async fetchUserById(id: string): Promise<User | null> {
+    return prisma.user.findUnique({ where: { id } });
   }
 }

@@ -10,3 +10,7 @@ export const loginSchema = z.object({
   email: z.string().email().trim(),
   password: z.string().min(8),
 });
+
+export const refreshSchema = z.object({
+  token: z.string("Token is missing"),
+});

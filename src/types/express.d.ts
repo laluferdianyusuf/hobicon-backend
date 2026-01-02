@@ -14,3 +14,15 @@ declare global {
     }
   }
 }
+
+import "express";
+
+declare module "express" {
+  interface Request {
+    user?: {
+      id: string;
+      email: string;
+      role: "STUDENT" | "COACH" | "ADMIN" | "PARENT" | String;
+    };
+  }
+}
