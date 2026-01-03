@@ -3,3 +3,4 @@ export * from "./events.controllers";
 export * from "./profile.controllers";
 export * from "./team.controllers";
 export * from "./registration.controllers";
+export * from "./result.controllers";

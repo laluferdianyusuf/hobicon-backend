@@ -73,7 +73,6 @@ export class RegistrationServices {
     const reg = await this.registrationRepo.findById(id);
     if (!reg) throw new HttpError("Registration not found", 404);
 
-    // if individual — check profile owner
     if (reg.profileId) {
       const profile = await this.profileRepo.findById(reg.profileId);
 
@@ -81,7 +80,6 @@ export class RegistrationServices {
       if (profile.userId !== userId) throw new HttpError("Forbidden", 403);
     }
 
-    // if team — only coach can delete
     if (reg.teamId) {
       const team = await this.teamRepo.findById(reg.teamId);
 
